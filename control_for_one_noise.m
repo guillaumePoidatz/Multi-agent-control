@@ -6,7 +6,7 @@ clc;
 m = 0.6150; % mass
 g = 9.81; % gravity
 
-omega = 0.4; % We define omega = -w1-w2+w3+w4, with wi the angular velocity for each rotor.
+omega = 0.3; % We define omega = -w1-w2+w3+w4, with wi the angular velocity for each rotor.
 Jx = 0.0154;
 Jy = 0.0154;
 Jz = 0.0309;
