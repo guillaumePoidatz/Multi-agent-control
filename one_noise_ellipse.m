@@ -29,7 +29,7 @@ psi = 0;  psi_dot = 0;
 % Target position, velocity, acceleration, and pose
 xd = 10;  xd_v = 0;  xd_a = 0;
 yd = 10;  yd_v = 0;  yd_a = 0;
-zd = 100;  zd_v = 0;  zd_a = 0;
+zd = 10;  zd_v = 0;  zd_a = 0;
 
 phid = 2;  dphid = 0;  ddphid=0;
 thetad = 2;  dthetad = 0;  ddthetad=0;
@@ -37,6 +37,18 @@ psid = 1;  dpsid = 0;  ddpsid=0;
 
 % Gains
 [k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12] = deal(1);
+
+
+%% Trajectory
+% New trajectory parameters
+a_traj_x = 5;  % The long half-axis of the elliptical trajectory
+b_traj_y = 3;  % The short half-axis of an elliptical trajectory
+theta_traj = pi/4;  % Angle of rotation of elliptical trajectory
+
+% Add panning offset
+x_offset = 10;
+y_offset = 5;
+
 
 %% Loop
 
@@ -82,6 +94,11 @@ for t = 1:num_steps
     x10 = x_dot+0.1*randn(1);
     x11 = y+0.1*randn(1);
     x12 = y_dot+0.1*randn(1);
+    
+    % Calculate the elliptical trajectory position and add a translation offset
+    xd = a_traj_x * cos(t*dt) * cos(theta_traj) - b_traj_y * sin(t*dt) * sin(theta_traj) + x_offset;
+    yd = a_traj_x * cos(t*dt) * sin(theta_traj) + b_traj_y * sin(t*dt) * cos(theta_traj) + y_offset;
+    zd = 10;  % A fixed height is still used here
     
     % Position system
     ez_dot = x8 - zd_v;
