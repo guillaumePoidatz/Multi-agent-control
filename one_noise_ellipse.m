@@ -33,7 +33,7 @@ zd = 10;  zd_v = 0;  zd_a = 0;
 
 phid = 2;  dphid = 0;  ddphid=0;
 thetad = 2;  dthetad = 0;  ddthetad=0;
-psid = 1;  dpsid = 0;  ddpsid=0;
+psid = 0;  dpsid = 0;  ddpsid=0;
 
 % Gains
 [k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12] = deal(1);
@@ -67,21 +67,6 @@ figure;
 
 for t = 1:num_steps
     % Adding noises to states
-    
-    % The main elements of the noise problem are analysed:
-    % a. The amount of noise that each state can withstand is checked by varying the coefficient in front of randn
-    %    Assessment indicators: 
-    %    1. Within 200 steps (the simulation time can be reduced or extended appropriately, depending on the convergence). 
-    %       Whether to reach a stable value (stable value interval).
-    %       Note that the stable value here is not strictly the objective value. 
-    %       For example, if the target value of x is 10, since the system is not able to converge perfectly to 10, 
-    %       we can consider that any value in the range of 10 +- 0.05 is considered to reach the stable value.
-    %    2. If a stabilised value is reached, the change in system performance compared to the previous situation without noise. 
-    %       For example, whether there is a certain delay, whether there is still a certain fluctuation in the final, etc.. 
-    %    3. Compare the fluctuations of the curves to reflect the effect of noise on the system.
-    % b. Extension analysis: whether the size of the noise amplitude that can be added is related to the target value of that state quantity. 
-    %    For example, when zd is 100, it can withstand 10*randn noise, and when zd is 10 the original noise will significantly interfere with the system.
-    
     x1 = phi+0.1*randn(1);
     x2 = phi_dot+0.1*randn(1);
     x3 = theta+0.1*randn(1);
@@ -98,7 +83,7 @@ for t = 1:num_steps
     % Calculate the elliptical trajectory position and add a translation offset
     xd = a_traj_x * cos(t*dt) * cos(theta_traj) - b_traj_y * sin(t*dt) * sin(theta_traj) + x_offset;
     yd = a_traj_x * cos(t*dt) * sin(theta_traj) + b_traj_y * sin(t*dt) * cos(theta_traj) + y_offset;
-    zd = 10;  % A fixed height is still used here
+    zd = 2;  % A fixed height is still used here
     
     % Position system
     ez_dot = x8 - zd_v;

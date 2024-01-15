@@ -27,9 +27,9 @@ theta = 0;  theta_dot = 0;
 psi = 0;  psi_dot = 0;
 
 % Target position, velocity, acceleration, and pose
-xd = 2;  xd_v = 0;  xd_a = 0;
-yd = 2;  yd_v = 0;  yd_a = 0;
-zd = 2;  zd_v = 0;  zd_a = 0;
+xd = 100;  xd_v = 0;  xd_a = 0;
+yd = 100;  yd_v = 0;  yd_a = 0;
+zd = 100;  zd_v = 0;  zd_a = 0;
 
 phid = 2;  phid_dot = 0;  phid_double_dot = 0;
 thetad = 2;  thetad_dot = 0;  thetad_double_dot = 0;
@@ -66,7 +66,7 @@ x12 = y_dot;
 
 %% Loop
 
-num_steps = 100;
+num_steps = 200;
 dt = 0.1;  % Adjusted time step for better animation
 
 % Arrays to store state values
@@ -80,6 +80,34 @@ y_array = zeros(num_steps, 1);
 figure;
 
 for t = 1:num_steps
+%     % Without noises
+%     x1 = phi;
+%     x2 = phi_dot;
+%     x3 = theta;
+%     x4 = theta_dot;
+%     x5 = psi;
+%     x6 = psi_dot;
+%     x7 = z;
+%     x8 = z_dot;
+%     x9 = x;
+%     x10 = x_dot;
+%     x11 = y;
+%     x12 = y_dot;
+    
+    % Adding noises to states
+    x1 = phi+0.1*randn(1);
+    x2 = phi_dot+0.1*randn(1);
+    x3 = theta+0.1*randn(1);
+    x4 = theta_dot+0.1*randn(1);
+    x5 = psi+0.1*randn(1);
+    x6 = psi_dot+0.1*randn(1);
+    x7 = z+0*randn(1);
+    x8 = z_dot+0.1*randn(1);
+    x9 = x+0.1*randn(1);
+    x10 = x_dot+0.1*randn(1);
+    x11 = y+0.1*randn(1);
+    x12 = y_dot+0.1*randn(1);
+    
     % Position system
     ez_dot = x8 - zd_v;
     e2 = x8 - zd_v + k1 * (x7 - zd);
@@ -130,20 +158,6 @@ for t = 1:num_steps
     z = z + z_dot * dt;
     x = x + x_dot * dt;
     y = y + y_dot * dt;
-    
-   % Update of all the xi
-    x1 = phi;
-    x2 = phi_dot;
-    x3 = theta;
-    x4 = theta_dot;
-    x5 = psi;
-    x6 = psi_dot;
-    x7 = z;
-    x8 = z_dot;
-    x9 = x;
-    x10 = x_dot;
-    x11 = y;
-    x12 = y_dot;
     
     % Store state values
     if t <= num_steps
