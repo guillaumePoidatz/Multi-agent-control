@@ -98,8 +98,8 @@ for t = 1:num_steps
     uy = m * (-yd_a + k5 * ey_dot + k6 * e4) / u1;
 
     % Pose system
-%     phid = asin(ux * sin(x5) - uy * cos(x5));
-%     thetad = asin(ux / (cos(x1) * cos(x5)) - sin(x1) * sin(x5) / (cos(x1) * cos(x5)));
+    phid = asin(ux * sin(x5) - uy * cos(x5));
+    thetad = asin(ux / (cos(x1) * cos(x5)) - sin(x1) * sin(x5) / (cos(x1) * cos(x5)));
     
     ephi_dot = x2 - dphid;
     e5 = x2 - dphid + k7 * (x1 - phid);
