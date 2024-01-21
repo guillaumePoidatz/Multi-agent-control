@@ -86,30 +86,25 @@ dt = 0.01; % Adjusted time step for better animation
 [x_cmd_array, y_cmd_array, z_cmd_array] = deal(zeros(num_steps, 1));
 
 for i = 1:num_steps
-    % traj_1
-%     x_cmd_array(i) = 1/3*(xd_1 + xd_2 + xd_3); % this is the simplest tracjectory for the centre masse. only one point as the destination
+%     traj_1
+%     x_cmd_array(i) = 1/3*(xd_1 + xd_2 + xd_3); % this is the simplest tracje ctory for the centre masse. only one point as the destination
 %     y_cmd_array(i) = 1/3*(yd_1 + yd_2 + yd_3);
 %     z_cmd_array(i) = 1/3*(zd_1 + zd_2 + zd_3);
 
-    % traj_3
-%     x_cmd_array(i) = 1/3*(xd_1 + xd_2 + xd_3) + 0.1*i*2; % 
-%     y_cmd_array(i) = 1/3*(yd_1 + yd_2 + yd_3) + 0.1*i*2;
-%     z_cmd_array(i) = 1/3*(zd_1 + zd_2 + zd_3) + 0.1*1*2;
-    
-%     if mod(i,2)==1 % after we define the next point of cm, we keep it for 4 steps in order to give drone enough time to follow this point
+%     %traj_2
+    x_cmd_array(i) = x_cm - a_radius + a_radius * cos(1*i*dt);
+    y_cmd_array(i) = y_cm + b_radius * sin(1*i*dt);
+    z_cmd_array(i) = z_cm + 10*i*dt;
+
+%     if mod(i,10)==1 % after we define the next point of cm, we keep it for 4 steps in order to give drone enough time to follow this point
 %         x_cmd_array(i) = x_cm - a_radius + a_radius * cos(1*i*dt);
 %         y_cmd_array(i) = y_cm + b_radius * sin(1*i*dt);
-%         z_cmd_array(i) = z_cm + 2*i*dt;
+%         z_cmd_array(i) = z_cm + 10*i*dt;
 %     else
 %         x_cmd_array(i) = x_cmd_array(i-1);
 %         y_cmd_array(i) = y_cmd_array(i-1);
 %         z_cmd_array(i) = z_cmd_array(i-1);
 %     end
-
-    %traj_2
-    x_cmd_array(i) = x_cm - a_radius + a_radius * cos(1*i*dt);
-    y_cmd_array(i) = y_cm + b_radius * sin(1*i*dt);
-    z_cmd_array(i) = z_cm + 10*i*dt;
 end
 
 %% main loop
@@ -143,6 +138,47 @@ for t = 1:num_steps
     % b. Extension analysis: whether the size of the noise amplitude that can be added is related to the target value of that state quantity. 
     %    For example, when zd is 100, it can withstand 10*randn noise, and when zd is 10 the original noise will significantly interfere with the system.
     
+% %%% states without noise   
+%     x1_1 = phi_1;
+%     x2_1 = phi_1_dot;
+%     x3_1 = theta_1;
+%     x4_1 = theta_1_dot;
+%     x5_1 = psi_1 ;
+%     x6_1 = psi_1_dot ;
+%     x7_1 = z_1 ;
+%     x8_1 = z_1_dot ;
+%     x9_1 = x_1 ;
+%     x10_1 = x_1_dot ;
+%     x11_1 = y_1 ;
+%     x12_1 = y_1_dot;
+%     
+%     x1_2 = phi_2 ;
+%     x2_2 = phi_2_dot ;
+%     x3_2 = theta_2 ;
+%     x4_2 = theta_2_dot ;
+%     x5_2 = psi_2 ;
+%     x6_2 = psi_2_dot ;
+%     x7_2 = z_2 ;
+%     x8_2 = z_2_dot ;
+%     x9_2 = x_2 ;
+%     x10_2 = x_2_dot;
+%     x11_2 = y_2 ;
+%     x12_2 = y_2_dot;
+%     
+%     x1_3 = phi_3 ;
+%     x2_3 = phi_3_dot ;
+%     x3_3 = theta_3 ;
+%     x4_3 = theta_3_dot ;
+%     x5_3 = psi_3 ;
+%     x6_3 = psi_3_dot;
+%     x7_3 = z_3 ;
+%     x8_3 = z_3_dot ;
+%     x9_3 = x_3;
+%     x10_3 = x_3_dot;
+%     x11_3 = y_3 ;
+%     x12_3 = y_3_dot;
+
+%% states with noise
     x1_1 = phi_1 + 0.1*randn(1);
     x2_1 = phi_1_dot + 0.1*randn(1);
     x3_1 = theta_1 + 0.1*randn(1);
@@ -204,6 +240,9 @@ for t = 1:num_steps
     ux_1 = m * (-xd_1_a + k3 * ex_1_dot + k4 * e3_1) / u1_1;
     uy_1 = m * (-yd_1_a + k5 * ey_1_dot + k6 * e4_1) / u1_1;
 
+    phid_1 = asin(ux_1 * sin(x5_1) - uy_1 * cos(x5_1));
+    thetad_1 = asin(ux_1 / (cos(x1_1) * cos(x5_1)) - sin(x1_1) * sin(x5_1) / (cos(x1_1) * cos(x5_1)));
+    
     % for Pose system part
     ephi_1_dot = x2_1 - dphid_1;
     e5_1 = x2_1 - dphid_1 + k7 * (x1_1 - phid_1);
@@ -215,7 +254,7 @@ for t = 1:num_steps
     u2_1 = (-x4_1 * x6_1 * a1 + x4_1 * b1 + ddphid_1 - k7 * ephi_1_dot - k8 * e5_1) / c1;
     u3_1 = (-x2_1 * x6_1 * a2 + x2_1 * b2 + ddthetad_1 - k9 * etheta_1_dot - k10 * e6_1) / c2;
     u4_1 = (-x2_1 * x4_1 * a3 + ddpsid_1 - k11 * epsi_1_dot - k12 * e7_1) / c3;
-
+   
     % Update of states
     phi_1_double_dot = x4_1 * x6_1 * a1 - x4_1 * b1 + c1 * u2_1;
     theta_1_double_dot = x2_1 * x6_1 * a2 - x2_1 * b2 + c2 * u3_1;
@@ -269,6 +308,9 @@ for t = 1:num_steps
     ux_2 = m * (-xd_2_a + k3 * ex_2_dot + k4 * e3_2) / u1_2;
     uy_2 = m * (-yd_2_a + k5 * ey_2_dot + k6 * e4_2) / u1_2;
 
+    phid_2 = asin(ux_2 * sin(x5_2) - uy_2 * cos(x5_2));
+    thetad_2 = asin(ux_2 / (cos(x1_2) * cos(x5_2)) - sin(x1_2) * sin(x5_2) / (cos(x1_2) * cos(x5_2)));
+    
     % Pose system
     ephi_2_dot = x2_2 - dphid_2;
     e5_2 = x2_2 - dphid_2 + k7 * (x1_2 - phid_2);
@@ -334,6 +376,9 @@ for t = 1:num_steps
     ux_3 = m * (-xd_3_a + k3 * ex_3_dot + k4 * e3_3) / u1_3;
     uy_3 = m * (-yd_3_a + k5 * ey_3_dot + k6 * e4_3) / u1_3;
 
+    phid_3 = asin(ux_3 * sin(x5_3) - uy_3 * cos(x5_3));
+    thetad_3 = asin(ux_3 / (cos(x1_3) * cos(x5_3)) - sin(x1_3) * sin(x5_3) / (cos(x1_3) * cos(x5_3)));
+    
     % Pose system
     ephi_3_dot = x2_3 - dphid_3;
     e5_3 = x2_3 - dphid_3 + k7 * (x1_3 - phid_3);
@@ -398,6 +443,21 @@ end
 % grid on;
 % axis equal;
 % drawnow;
+figure(1)
+plot3(x_1_array, y_1_array, z_1_array,'-o');
+hold on
+plot3(x_2_array, y_2_array, z_2_array,'-o');
+plot3(x_3_array, y_3_array, z_3_array,'-o');
+hold off
+xlabel('X');
+ylabel('Y');
+zlabel('Z');
+title('Actual trajectory of drones');
+legend('drone_1','drone_2','drone_3');
+grid on;
+axis equal;
+drawnow;
+
 
 p_cm=[p_cm; p_cm(end,:)];
 figure(2)
@@ -419,7 +479,7 @@ hold off
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
-title('Trajectory Animation of three drones');
+title('Target Trajectory of three drones');
 grid on;
 axis equal;
 legend('drone_1','drone_2','drone_3');
@@ -499,9 +559,9 @@ plot(0:dt:(num_steps-1)*dt, phi_2_dot_array, '-','DisplayName','phi_2_dot');
 plot(0:dt:(num_steps-1)*dt, phi_3_dot_array, '-','DisplayName','phi_2_dot');
 hold off
 xlabel('Time (s)');
-ylabel('\phi_dot');
+ylabel('\phi dot');
 title('Speed of Roll Angle');
-legend('phi_1_dot','phi_2_dot','phi_3_dot');
+legend('phi_{1}dot','phi_{2}dot','phi_{3}dot');
 
 subplot(3, 2, 4);
 plot(0:dt:(num_steps-1)*dt, theta_1_dot_array, '-');
@@ -510,9 +570,9 @@ plot(0:dt:(num_steps-1)*dt, theta_2_dot_array, '-');
 plot(0:dt:(num_steps-1)*dt, theta_3_dot_array, '-');
 hold off
 xlabel('Time (s)');
-ylabel('\theta_dot');
+ylabel('\theta dot');
 title('Speed of Pitch Angle');
-legend('theta_1_dot','theta_2_dot','theta_3_dot');
+legend('theta_{1}dot','theta_{2}dot','theta_{3}dot');
 
 subplot(3, 2, 6);
 plot(0:dt:(num_steps-1)*dt, psi_1_dot_array, '-');
@@ -521,9 +581,9 @@ plot(0:dt:(num_steps-1)*dt, psi_2_dot_array, '-');
 plot(0:dt:(num_steps-1)*dt, psi_3_dot_array, '-');
 hold off
 xlabel('Time (s)');
-ylabel('\psi_dot');
+ylabel('\psi dot');
 title('Speed of Yaw Angle');
-legend('psi_1_dot','psi_2_dot','psi_3_dot');
+legend('psi_{1}dot','psi_{2}dot','psi_{3}dot');
 
 subplot(3, 2, 1);
 plot(0:dt:(num_steps-1)*dt, z_1_dot_array, '-');
@@ -532,9 +592,9 @@ plot(0:dt:(num_steps-1)*dt, z_2_dot_array, '-');
 plot(0:dt:(num_steps-1)*dt, z_3_dot_array, '-');
 hold off
 xlabel('Time (s)');
-ylabel('Z_dot');
+ylabel('Z dot');
 title('Speed in axe Z');
-legend('z_1_dot','z_2_dot','z_3_dot')
+legend('z_{1}dot','z_{2}dot','z_{3}dot')
 
 
 subplot(3, 2, 3);
@@ -544,9 +604,9 @@ plot(0:dt:(num_steps-1)*dt, x_2_dot_array, '-');
 plot(0:dt:(num_steps-1)*dt, x_3_dot_array, '-');
 hold off
 xlabel('Time (s)');
-ylabel('X_dot');
+ylabel('X dot');
 title('Speed in axe X');
-legend('x_1_dot','x_2_dot','x_3_dot')
+legend('x_{1}dot','x_{2}dot','x_{3}dot')
 
 subplot(3, 2, 5);
 plot(0:dt:(num_steps-1)*dt, y_1_dot_array, '-');
@@ -555,9 +615,9 @@ plot(0:dt:(num_steps-1)*dt, y_2_dot_array, '-');
 plot(0:dt:(num_steps-1)*dt, y_3_dot_array, '-');
 hold off
 xlabel('Time (s)');
-ylabel('Y_dot');
+ylabel('Y dot');
 title('Speed in axe Y ');
-legend('y_1_dot','y_2_dot','y_3_dot')
+legend('y_{1}dot','y_{2}dot','y_{3}dot')
 
 
 % % Adjust the layout
@@ -626,3 +686,37 @@ xlabel('Time (s)');
 ylabel('Error');
 title("Evolution of error detween actual center of mass and designed center of mass")
 legend('gravity center error z','gravity center error y','gravity center error x')
+
+figure(8)
+subplot(1,3,1)
+plot(0:dt:(num_steps-1)*dt,p_1(:,1)-x_1_array);
+hold on
+plot(0:dt:(num_steps-1)*dt,p_2(:,1)-x_2_array);
+plot(0:dt:(num_steps-1)*dt,p_3(:,1)-x_3_array);
+hold off
+xlabel('Time (s)');
+ylabel('Error of position on axe X');
+title("Evolution of difference between target trajectory and real trajectory on axe X")
+legend('x_{1d}-x_1','x_{2d}-x_2','x_{3d}-x_3')
+
+subplot(1,3,2)
+plot(0:dt:(num_steps-1)*dt,p_1(:,2)-y_1_array);
+hold on
+plot(0:dt:(num_steps-1)*dt,p_2(:,2)-y_2_array);
+plot(0:dt:(num_steps-1)*dt,p_3(:,2)-y_3_array);
+hold off
+xlabel('Time (s)');
+ylabel('Error of position on axe Y');
+title("Evolution of difference between target trajectory and real trajectory on axe Y")
+legend('y_{1d}-y_1','y_{2d}-y_2','y_{3d}-y_3')
+
+subplot(1,3,3)
+plot(0:dt:(num_steps-1)*dt,p_1(:,3)-z_1_array);
+hold on
+plot(0:dt:(num_steps-1)*dt,p_2(:,3)-z_2_array);
+plot(0:dt:(num_steps-1)*dt,p_3(:,3)-z_3_array);
+hold off
+xlabel('Time (s)');
+ylabel('Error of position on axe Z');
+title("Evolution of difference between target trajectory and real trajectory on axe Z")
+legend('z_{1d}-z_1','z_{2d}-z_2','z_{3d}-z_3')

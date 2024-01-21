@@ -27,9 +27,9 @@ theta = 0;  theta_dot = 0;
 psi = 0;  psi_dot = 0;
 
 % Target position, velocity, acceleration, and pose
-xd = 100;  xd_v = 0;  xd_a = 0;
-yd = 100;  yd_v = 0;  yd_a = 0;
-zd = 100;  zd_v = 0;  zd_a = 0;
+xd = 2;  xd_v = 0;  xd_a = 0;
+yd = 2;  yd_v = 0;  yd_a = 0;
+zd = 2;  zd_v = 0;  zd_a = 0;
 
 phid = 2;  phid_dot = 0;  phid_double_dot = 0;
 thetad = 2;  thetad_dot = 0;  thetad_double_dot = 0;

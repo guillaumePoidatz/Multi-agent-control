@@ -30,8 +30,6 @@ p3(1,1) = x_3;
 p3(1,2) = y_3;
 p3(1,3) = z_3;
 
-
-
 %% main loop
 for k = 1:num_steps - 1
     
@@ -42,37 +40,23 @@ for k = 1:num_steps - 1
     Pcm = [Xcm, Ycm, Zcm];
     Pcm_array = [Pcm_array; Pcm];
     
-    gain = 50;
+    gain_k = 20;
     
     % u1, u2, u3 are speeds of drones, defined by user as the iuputs, we have u1 = x1_dot, u2 = x2_dot, u3 = x3_dot.
     % we take the drone_1 as the leader, so u is a term of u1
     
-    %faux
-%     u1 = 50*(p2(k,:)-p1(k,:) + dp12) -3 *gain*min((Pcm - Pcmd_array(k,:)),10);
-%     u2 = 50*(p1(k,:) - p2(k,:) - dp12) + 50*(p3(k,:) - p2(k,:) - dp23);
-%     u3 = 50*(p2(k,:) - p3(k,:) + dp23);
-    
-    u1 = 50*(p2(k,:)-p1(k,:) + dp12) -3 *gain*min((Pcm - Pcmd_array(k,:)),10);
-    u2 = 50*(p1(k,:) - p2(k,:) - dp12) + 50*(p3(k,:) - p2(k,:) + dp23);
-    u3 = 50*(p2(k,:) - p3(k,:) - dp23);
-
-%     u1 = 2*(p2(k,:)-p1(k,:) + dp12) -0.1 *gain*min((Pcm - Pcmd_array(k,:)),10);
+%%%%% with constriant
+%     u1 = 2*(p2(k,:) - p1(k,:) + dp12) - gain_k*min((Pcm - Pcmd_array(k,:)),1000);  % modifiy gain to 1 by default
 %     u2 = 2*(p1(k,:) - p2(k,:) - dp12) + 2*(p3(k,:) - p2(k,:) + dp23);
 %     u3 = 2*(p2(k,:) - p3(k,:) - dp23);
 
-
+    u1 = 20*(p2(k,:) - p1(k,:) + dp12) - gain_k*(Pcm - Pcmd_array(k,:)); 
+    u2 = 20*(p1(k,:) - p2(k,:) - dp12) + 20*(p3(k,:) - p2(k,:) + dp23);
+    u3 = 20*(p2(k,:) - p3(k,:) - dp23);
     
     % update the position by using the equation: x(k+1) = x(k) + v*delta_t  
     p1(k+1,:) = p1(k,:) + dt * u1;
     p2(k+1,:) = p2(k,:) + dt * u2;
     p3(k+1,:) = p3(k,:) + dt * u3;
-    
 end
-%% figures
-% figure(2)
-% plot3(p1(:,1), p1(:,2), p1(:,3),'-o');
-% hold on
-% plot3(p2(:,1), p2(:,2), p2(:,3),'-o');
-% plot3(p3(:,1), p3(:,2), p3(:,3),'-o');
-% hold off
 end
